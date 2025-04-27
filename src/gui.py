@@ -17,6 +17,11 @@ config = {
     "model": "DeepSeek",
     "show_ip": False,
     "show_console": False,
+    "headless": True,
+    "selenium_grid": {
+        "host": "",
+        "port": ""
+    },
     "models": {
         "deepseek": {
             "email": "",
@@ -262,20 +267,41 @@ def open_config_window():
         browser_menu = ctk.CTkOptionMenu(config_window, variable=browser_var, values=browser_options)
         browser_menu.grid(row=8, column=1, padx=10, pady=5, sticky="ew")
 
+        # Headless mode
+        headless_label = ctk.CTkLabel(config_window, text="Headless mode:")
+        headless_label.grid(row=9, column=0, padx=10, pady=5, sticky="w")
+        headless_var = ctk.BooleanVar(value=config.get("headless", True))
+        headless_switch = ctk.CTkSwitch(config_window, variable=headless_var, text="")
+        headless_switch.grid(row=9, column=1, padx=10, pady=5, sticky="w")
+
+        # Selenium Grid host
+        grid_host_label = ctk.CTkLabel(config_window, text="Selenium Grid Host:")
+        grid_host_label.grid(row=10, column=0, padx=10, pady=5, sticky="w")
+        grid_host_entry = ctk.CTkEntry(config_window, width=250)
+        grid_host_entry.grid(row=10, column=1, padx=10, pady=5, sticky="ew")
+        grid_host_entry.insert(0, config.get("selenium_grid", {}).get("host", ""))
+
+        # Selenium Grid port
+        grid_port_label = ctk.CTkLabel(config_window, text="Selenium Grid Port:")
+        grid_port_label.grid(row=11, column=0, padx=10, pady=5, sticky="w")
+        grid_port_entry = ctk.CTkEntry(config_window, width=250)
+        grid_port_entry.grid(row=11, column=1, padx=10, pady=5, sticky="ew")
+        grid_port_entry.insert(0, config.get("selenium_grid", {}).get("port", ""))
+
         show_ip_label = ctk.CTkLabel(config_window, text="Show IP:")
-        show_ip_label.grid(row=9, column=0, padx=10, pady=5, sticky="w")
+        show_ip_label.grid(row=12, column=0, padx=10, pady=5, sticky="w")
         show_ip_var = ctk.BooleanVar(value=config["show_ip"])
         show_ip_switch = ctk.CTkSwitch(config_window, variable=show_ip_var, text="")
-        show_ip_switch.grid(row=9, column=1, padx=10, pady=5, sticky="w")
+        show_ip_switch.grid(row=12, column=1, padx=10, pady=5, sticky="w")
 
         show_console_label = ctk.CTkLabel(config_window, text="Show Console:")
-        show_console_label.grid(row=10, column=0, padx=10, pady=5, sticky="w")
+        show_console_label.grid(row=13, column=0, padx=10, pady=5, sticky="w")
         show_console_var = ctk.BooleanVar(value=config["show_console"])
         show_console_switch = ctk.CTkSwitch(config_window, variable=show_console_var, text="")
-        show_console_switch.grid(row=10, column=1, padx=10, pady=5, sticky="w")
+        show_console_switch.grid(row=13, column=1, padx=10, pady=5, sticky="w")
 
         button_frame = ctk.CTkFrame(config_window, fg_color="transparent")
-        button_frame.grid(row=11, column=0, columnspan=2, padx=10, pady=10, sticky="ew")
+        button_frame.grid(row=14, column=0, columnspan=2, padx=10, pady=10, sticky="ew")
         button_frame.grid_columnconfigure(0, weight=1)
         button_frame.grid_columnconfigure(1, weight=1)
 
@@ -284,6 +310,9 @@ def open_config_window():
             command=lambda: save_config(
                 config_window,
                 browser_var,
+                headless_var,
+                grid_host_entry,
+                grid_port_entry,
                 show_ip_var,
                 show_console_var,
                 d_email_entry,
@@ -306,6 +335,9 @@ def open_config_window():
 def save_config(
         config_window,
         browser_var,
+        headless_var,
+        grid_host_entry,
+        grid_port_entry,
         show_ip_var,
         show_console_var,
         d_email_entry,
@@ -317,6 +349,11 @@ def save_config(
     ):
     try:
         config["browser"] = browser_var.get()
+        config["headless"] = headless_var.get()
+        config["selenium_grid"] = {
+            "host": grid_host_entry.get(),
+            "port": grid_port_entry.get()
+        }
         config["show_ip"] = show_ip_var.get()
         config["show_console"] = show_console_var.get()
 
